@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".Fragments.VideoFragment">
+
+    <ScrollView
+        android:layout_weight="0.93"
+        android:layout_width="match_parent"
+        android:layout_height="0dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <com.google.android.exoplayer2.ui.SimpleExoPlayerView
+                android:id="@+id/video_player"
+                android:background="@android:color/black"
+                android:layout_width="match_parent"
+                android:layout_gravity="center"
+                android:minHeight="250dp"
+                android:layout_height="match_parent" />
+
+            <TextView
+                android:id="@+id/step_wrong_message"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_gravity="center"
+                android:textSize="25sp"
+                android:textColor="@android:color/holo_red_light"
+                />
+            <TextView
+                android:id="@+id/step_description_tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_gravity="center"
+                android:textSize="20sp"
+                android:layout_marginTop="30dp"/>
+
+        </LinearLayout>
+
+    </ScrollView>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_weight="0.07"
+        android:layout_width="match_parent"
+        android:layout_height="0dp">
+
+        <TextView
+            android:id="@+id/prev"
+            android:layout_weight="0.2"
+            android:textColor="@color/colorAccent"
+            android:layout_marginLeft="10dp"
+            android:textSize="30sp"
+            android:text="@string/prev"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"/>
+        <TextView
+            android:layout_weight="0.6"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"/>
+        <TextView
+            android:id="@+id/next"
+            android:layout_gravity="center"
+            android:layout_weight="0.2"
+            android:textColor="@color/colorAccent"
+            android:layout_marginLeft="10dp"
+            android:textSize="30sp"
+            android:text="next"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"/>
+
+    </LinearLayout>
+
+
+</LinearLayout>
