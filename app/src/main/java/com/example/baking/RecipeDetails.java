@@ -1,10 +1,12 @@
 package com.example.baking;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,6 +32,7 @@ public class RecipeDetails extends AppCompatActivity implements StepFragment.OnS
 
     boolean isTablet;
     Recipe recipe;
+    public static int position = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,14 +40,22 @@ public class RecipeDetails extends AppCompatActivity implements StepFragment.OnS
         setContentView(R.layout.activity_recipe_details);
 
         ButterKnife.bind(this);
-
-        recipe = (Recipe) getIntent().getSerializableExtra("Recipe");
-        setTitle(recipe.getName());
-
         isTablet = getResources().getBoolean(R.bool.isTablet);
-
-        initFragments();
-
+        if(savedInstanceState!=null) {
+            recipe = (Recipe) savedInstanceState.getSerializable("Recipe");
+            position = savedInstanceState.getInt("position");
+            if (!isTablet && savedInstanceState.getBoolean("isVideo")) {
+                leftLayout.setVisibility(View.GONE);
+                vidFrame.setVisibility(View.VISIBLE);
+            }
+            initVidFragment();
+        }
+        else {
+            recipe = (Recipe) getIntent().getSerializableExtra("Recipe");
+            setTitle(recipe.getName());
+            position = 0;
+            initFragments();
+        }
     }
 
     @Override
@@ -70,13 +81,13 @@ public class RecipeDetails extends AppCompatActivity implements StepFragment.OnS
 
         initStepFragment();
 
-        initVidFragment(0);
+        initVidFragment();
         if(isTablet)
             vidFrame.setVisibility(View.VISIBLE);
 
     }
 
-    private void initVidFragment(int position) {
+    private void initVidFragment() {
         VideoFragment videoFragment = new VideoFragment();
 
         Bundle bundle = new Bundle();
@@ -121,11 +132,27 @@ public class RecipeDetails extends AppCompatActivity implements StepFragment.OnS
         }
     }
     @Override
-    public void onStepListener(int position) {
+    public void onStepListener(int indx) {
         if(!isTablet){
             leftLayout.setVisibility(View.GONE);
             vidFrame.setVisibility(View.VISIBLE);
         }
-        initVidFragment(position);
+        position = indx;
+        initVidFragment();
     }
+
+    @Override
+    public void onRestoreInstanceState(@Nullable Bundle savedInstanceState, @Nullable PersistableBundle persistentState) {
+        super.onRestoreInstanceState(savedInstanceState, persistentState);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putBoolean("isVideo", vidFrame.getVisibility() == View.VISIBLE);
+        outState.putInt("position", position);
+        outState.putSerializable("Recipe",recipe);
+        super.onSaveInstanceState(outState);
+
+    }
+
 }

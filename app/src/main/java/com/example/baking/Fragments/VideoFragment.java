@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import com.example.baking.R;
 import com.example.baking.Recipe.Recipe;
+import com.example.baking.RecipeDetails;
 import com.example.baking.Steps.Step;
 import com.example.baking.VideoPlayerConfig;
 import com.google.android.exoplayer2.DefaultLoadControl;
@@ -44,6 +45,7 @@ import com.google.android.exoplayer2.upstream.BandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultAllocator;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
+import com.google.android.exoplayer2.util.Util;
 
 import java.util.List;
 
@@ -87,6 +89,7 @@ public class VideoFragment extends Fragment implements Player.EventListener {
                     Toast.makeText(getContext(), R.string.noPrev,Toast.LENGTH_SHORT).show();
                 else{
                     position--;
+                    ((RecipeDetails)getActivity()).position=position;
                     updateStep();
                 }
             }
@@ -99,6 +102,7 @@ public class VideoFragment extends Fragment implements Player.EventListener {
                     Toast.makeText(getContext(), R.string.noNext,Toast.LENGTH_SHORT).show();
                 else{
                     position++;
+                    ((RecipeDetails)getActivity()).position=position;
                     updateStep();
                 }
             }
@@ -130,6 +134,14 @@ public class VideoFragment extends Fragment implements Player.EventListener {
         mSimpleExoPlayer.prepare(mediaSource);
         mSimpleExoPlayer.setPlayWhenReady(true);
         mSimpleExoPlayer.addListener(this);
+    }
+
+
+    private void resumePlayer() {
+        if (mSimpleExoPlayer != null) {
+            mSimpleExoPlayer.setPlayWhenReady(true);
+            mSimpleExoPlayer.getPlaybackState();
+        }
     }
 
     private void initializePlayer() {
@@ -176,7 +188,6 @@ public class VideoFragment extends Fragment implements Player.EventListener {
 
     @Override
     public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-
     }
 
     @Override
@@ -210,9 +221,36 @@ public class VideoFragment extends Fragment implements Player.EventListener {
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        if (Util.SDK_INT > 23) {
+            initializePlayer();
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if ((Util.SDK_INT <= 23 || mSimpleExoPlayer == null)) {
+            initializePlayer();
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (Util.SDK_INT > 23) {
+            releasePlayer();
+        }
+    }
+
+
+    @Override
     public void onPause() {
         super.onPause();
-        pausePlayer();
+        if (Util.SDK_INT <= 23) {
+            releasePlayer();
+        }
         if (mRunnable != null) {
             mHandler.removeCallbacks(mRunnable);
         }
@@ -225,16 +263,11 @@ public class VideoFragment extends Fragment implements Player.EventListener {
     }
     private void releasePlayer() {
         if (mSimpleExoPlayer != null) {
+            position = (int) mSimpleExoPlayer.getCurrentPosition();
             mSimpleExoPlayer.release();
             mSimpleExoPlayer = null;
         }
-    }
 
-    private void pausePlayer() {
-        if (mSimpleExoPlayer != null) {
-            mSimpleExoPlayer.setPlayWhenReady(false);
-            mSimpleExoPlayer.getPlaybackState();
-        }
     }
 
 }
